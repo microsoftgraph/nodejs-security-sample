@@ -1,0 +1,15 @@
+﻿extends layout
+
+block content
+    h1.text-center= title
+    hr
+    .container-fluid
+        .row
+            .col-md-7
+                include ./alertForm.pug
+                hr
+                include ./updateForm.pug
+                
+            .col-md-5
+                include ./alertView.pug
+

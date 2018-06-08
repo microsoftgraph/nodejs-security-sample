@@ -1,0 +1,80 @@
+﻿
+-// define mixins
+mixin dropDownItems(label, id, ...items)
+    div(class!=attributes.class)
+        .form-group
+            label(for=id)= label
+            select.form-control(id=id name=id)
+                    each item in items
+                        if viewData.formData && item === viewData.formData[id]
+                            option(value=item selected)= item
+                        else 
+                            option(value=item)= item
+
+mixin textBoxForm(label, id, placeHolder)
+    div(class!=attributes.class)
+        .form-group
+            label(for=id)=label
+            if viewData.formData
+                input.form-control(id=id name=id type="text" placeholder=placeHolder value=viewData.formData[id])
+            else 
+                input.form-control(id=id name=id type="text" placeholder=placeHolder)
+    
+
+form(action="/GetAlerts" method="post")
+    h2 Select alerts to view
+    .container-fluid
+        .row
+            +dropDownItems("Top X", "top", 1, 5, 10, 20)(class="col-md-2")
+            +dropDownItems("Category", "category", "All", "abnormalLogin", "accessDenied", "anomalousDataAccess", "anonymousLogin", "antimalwareActionTaken", "azBlackListLogin", "credentialLeakage", "documentDeclassification", "reconnaissance", "exploit", "impossibleTravel", "keyloggerTrojan", "malware", "ransomware", "rdpBruteforce", "reportCompromise", "riskScore", "sensitiveFileExfiltration", "suspiciousActivity", "suspiciousDomain", "suspiciousPowerShell", "suspiciousActivity", "threatIntelligence", "unfamiliarLocation", "updateRequired")(class="col-md-3")
+            +dropDownItems("Status", "status", "All", "NewAlert", "InProgress", "Resolved")(class="col-md-2")
+            if !viewData.providers
+                - viewData.providers=['All']
+            else if viewData.providers[0] !== 'All'
+                - viewData.providers.unshift('All')
+            .col-md-3
+                .form-group
+                    label(for="provider") Provider
+                    select.form-control(id="provider", name="provider")
+                        each item in viewData.providers
+                            if viewData.formData && item === viewData.formData["provider"]
+                                option(value=item selected)= item
+                            else 
+                                option(value=item)= item
+            +dropDownItems("Severity", "severity", "All", "High", "Medium", "Low")(class="col-md-2")                 
+        .row
+            +textBoxForm("User Account", "upn", "Enter User Principal Name (UPN)")(class="col-md-5")
+            +textBoxForm("Host Name", "fqdn", "Enter Fully Qualified Domain Name")(class="col-md-5")
+            .col-md-2
+                .form-group
+                    label &nbsp;
+                    button.btn.btn-primary.form-control
+                        b.text-center Get Alerts
+
+if viewData.alerts
+    hr
+    h2 Matching alerts
+    .container-fluid
+        .row
+            .col-md-12
+                if viewData.alerts.value.length > 0
+                    .container-table
+                        table.table.table-striped(border='1' cellpadding='10')
+                            thead
+                                tr
+                                    th Title
+                                    th Category
+                                    th Status
+                                    th ID
+                                    th Provider
+                            tbody
+                                each alert in viewData.alerts.value
+                                    tr
+                                        td
+                                            a(href="/GetAlert/" + alert.id)=alert.title
+                                        td=alert.category
+                                        td=alert.status
+                                        td=alert.id
+                                        td=alert.vendorInformation.provider
+                else
+                    p No matching alerts

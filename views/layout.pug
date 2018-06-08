@@ -1,0 +1,64 @@
+﻿doctype html
+html
+    head
+        title= title
+        meta(charset='utf-8')
+        meta(name='viewport', content='width=device-width, initial-scale=1')
+        link(rel='stylesheet', href='https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css')
+        link(rel='stylesheet', href='https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap-theme.min.css')
+        
+        -// link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css')
+
+        link(rel='stylesheet', href='/stylesheets/main.css')
+
+        script(src="https://ajax.aspnetcdn.com/ajax/modernizr/modernizr-2.6.2.js")
+        script(src="https://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.1.js")
+
+        -// script(src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js")
+ 
+    body.container-fluid
+        header
+            nav.navbar.navbar-inverse.navbar-fixed-top
+                div.container-fluid
+                    div.navbar-header
+                        button(type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse")
+                            span.sr-only Toggle navigation
+                            span.icon-bar
+                            span.icon-bar
+                            span.icon-bar
+                        a.navbar-brand(href="/") Microsoft Graph Security API
+                    div.navbar-collapse.collapse
+                        ul.nav.navbar-nav
+                            li
+                                a(href='/') Home
+                        if viewData
+                            if viewData.user
+                                ul.nav.navbar-nav.navbar-right
+                                    li.navbar-text
+                                        -// var name = user.profile.displayName
+                                        | Hello,  #{viewData.user.profile.displayName}
+                                    li
+                                        a.nav-link(href="logout") Sign Out        
+                            else
+                                ul.nav.navbar-nav.navbar-right
+                                    li 
+                                        a.links(href='login') Sign in with Microsoft
+        main.container-fluid
+            -// show flash messages
+            while message = flash.shift()
+                .alert.alert-dismissible(class='alert-' + message.type role="alert") 
+                    button.close(type="button" data-dismiss="alert" aria-label="Close")
+                        span(aria-hidden="true") &times;
+                    p !{message.message}
+            block content
+
+        footer.container-fluid
+            hr
+            - var currentDate = new Date().getFullYear()
+            p &copy; #{currentDate} - #{title}
+        
+            script(src='https://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.2.3.min.js')
+            script(src='https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js')
+
+            -// script(src='https://code.jquery.com/jquery-3.3.1.slim.min.js')
+            -//script(src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js')

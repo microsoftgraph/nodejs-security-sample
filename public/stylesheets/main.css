@@ -1,0 +1,79 @@
+﻿body {
+    padding: 50px;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+/*
+a {
+    color: #00B7FF;
+}
+    */
+#appForm {
+    padding: 10px;
+}
+
+.navbar-header {
+    box-sizing: border-box;
+    display: block;  
+    height: 40px;  
+    line-height: 40px;  
+    font-family: 'Segoe UI Semilight WestEuropean', 'Segoe UI Semilight', 'Segoe WP Semilight', 'Segoe UI', 'Segoe WP', Tahoma, Arial, sans-serif; 
+    font-size: 17px; 
+    padding-left: 20px; 
+    position: relative;  
+    font-weight: bold;  
+  }
+
+.inputField {
+    display: inline-block;
+    padding: 1% 2%
+}
+
+#connect_button {
+    margin: 1%
+}
+
+#login_button {
+    position: -ms-page;
+    top: 80px;
+    right: 200px;
+}
+
+.container-table {
+    max-height: 265px;
+    overflow: auto;
+}
+
+pre {
+    background: transparent;
+    word-wrap: break-word;
+    border: 0
+}
+
+.tab-content {
+    height: 80vh;
+    border-left: 1px solid rgb(221, 221,221);
+    border-right: 1px solid rgb(221, 221,221);
+    border-bottom: 1px solid rgb(221, 221,221);
+    padding: 20px;
+}
+
+.container-tab .tab-content {
+    max-height: 100%;
+    overflow: auto;
+}
+
+.devices-details {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    clear: both
+}
+
+.profile-picture {
+    margin: 0 auto;
+}
+
+.user-info {
+    margin: 0 auto;
+}

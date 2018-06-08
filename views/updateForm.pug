@@ -1,0 +1,41 @@
+﻿
+
+
+form(action="/UpdateAlert" method="post")
+    h2 Manage alerts
+    .container-fluid
+        .row
+            .col-md-2
+                .form-group
+                    label(for='status') Update Status
+                    select.form-control(id='status' name='status')
+                            each item in ["NewAlert", "InProgress", "Resolved", "Unknown"]
+                                if viewData.alert && viewData.alert.status && item.toLowerCase() === viewData.alert.status.toLowerCase()
+                                    option(value=item selected)= item
+                                else 
+                                    option(value=item)= item
+                
+            .col-md-2
+                .form-group
+                    label(for='feedback') Feedback
+                    select.form-control(id='feedback' name='feedback')
+                            each item in ["Unknown", "TruePositive", "FalsePositive"]
+                                if viewData.alert && viewData.alert.feedback && item.toLowerCase() === viewData.alert.feedback.toLowerCase()
+                                    option(value=item selected)= item
+                                else 
+                                    option(value=item)= item
+            .col-md-6
+                .form-group
+                    label(for='comments') Comments 
+                    textArea.form-control(rows = 2, cols = 25, placeholder = "Enter comments" id='comments' name='comments')=(viewData.alert ? viewData.alert.comments : '')
+        .row
+            .col-md-6
+                .form-group
+                    label(for='alertId') Alert ID
+                    input.form-control(id='alertId' name='alertId' type="text" placeholder="Enter alert ID" value=(viewData.alert ? viewData.alert.id : ''))
+            .col-md-4
+            .col-md-2
+                .form-group
+                    label &nbsp;
+                    button.btn.btn-primary.form-control
+                        b.text-center Update alert

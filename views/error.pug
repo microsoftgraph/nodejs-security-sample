@@ -1,0 +1,9 @@
+﻿extends layout
+
+block content
+  h1= message
+  h1= error.code
+  h2= error.statusCode
+  h2= error.status
+  pre #{JSON.stringify(error.body, null, 4)}
+  pre=error.stack

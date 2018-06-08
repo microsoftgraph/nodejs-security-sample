@@ -1,0 +1,180 @@
+﻿
+
+.container-tab
+    ul.nav.nav-tabs(role="tablist")
+        li(role="presentation" class=(!viewData.oldAlert ? 'active' : ''))
+            a(href="#alert-metadata" aria-controls="alert-metadata" role="tab" data-toggle="tab") Alert details
+        li(role="presentation")
+            a(href="#user-device-metadata" aria-controls="user-device-metadata" role="tab" data-toggle="tab") User &amp; device details
+        if viewData.oldAlert 
+            li(role="presentation" class=(viewData.oldAlert ? 'active' : ''))
+                a(href="#update-alert-results" aria-controls="update-alert-results" role="tab" data-toggle="tab") Alert management
+
+    .tab-content
+        .tab-pane.fade.in(role="tabpanel" id="alert-metadata" class=(!viewData.oldAlert ? 'active' : ''))
+            if !viewData.sdkQuery && !viewData.restQuery 
+                span No alert selected
+            else 
+                p SDK query: #{viewData.sdkQuery}
+                p REST query: 
+                    if viewData.restQuery 
+                        | GET 
+                        - var url = "https://developer.microsoft.com/en-us/graph/graph-explorer?request=" + viewData.restQuery + "&method=GET&version=" + viewData.apiVersion + "&GraphUrl=https://graph.microsoft.com"
+                        a(href=url)=viewData.restUrl + viewData.restQuery
+                    else 
+                        | PATCH 
+                        | #{viewData.restUrl + viewData.postRestQuery.query}
+                        p body : #{JSON.stringify(viewData.postRestQuery.body, null, 4)}
+                if viewData.alertErr
+                    p=viewData.alertErr
+                if viewData.alert
+                    pre=JSON.stringify(viewData.alert, null, 4)
+
+        .tab-pane.fade.in(role="tabpanel" id="user-device-metadata")
+            if viewData.alert && viewData.alertUserState 
+                .row
+                    .col-md-2.profile-picture
+                        if viewData.alertUserPhoto
+                            img(src=("data:image/png;base64," + viewData.alertUserPhoto.toString('base64')) width='100' height='100')
+                        else
+                            p No photo available
+                    .col-md-9.user-info
+                        if viewData.alertUserState
+                            h3=viewData.alertUserState.displayName
+                            h3=viewData.alertUserState.mail ? viewData.alertUserState.mail : viewData.alertUserState.userPrincipalName
+                
+                div
+                    span Job tile: #{viewData.alertUserState.jobTitle ? viewData.alertUserState.jobTitle : 'No data'}
+                div
+                    span Manager: #{viewData.alertUserManager ?  viewData.alertUserManager.displayName : 'No data'}
+                div
+                    span Contact via: #{viewData.alertUserState.businessPhones ? viewData.alertUserState.businessPhones[0] : 'No data'}
+                div
+                    span Office location: #{viewData.alertUserState.officeLocation ? viewData.alertUserState.officeLocation : 'No data'}
+                div
+                    span Email: #{viewData.alertUserState.mail ? viewData.alertUserState.mail : viewData.alertUserState.userPrincipalName}
+
+                if viewData.UserOwnedDevices
+                    hr
+                    p User Owned Devices:
+                    pre=JSON.stringify(viewData.UserOwnedDevices, null, 4)
+                if viewData.UserRegisteredDevices
+                    hr
+                    p User Registered Devices:
+                    pre=JSON.stringify(viewData.UserRegisteredDevices, null, 4)
+
+
+
+
+
+                if viewData.alert && viewData.alert.hostStates[0]
+                    - var host = viewData.alert.hostStates[0]
+                    .container-fluid.devices-details
+                        hr
+                        if host.fqdn
+                            .row
+                                .col-md-2
+                                    img.center-block(src="laptop_icon.png" style="margin: 8px")
+                                .col-md-10
+                                    h3=host.fqdn
+                        div
+                            div
+                                span Azure AD joined: 
+                                span=(host.IsAzureDomainJoined ? host.IsAzureDomainJoined : "No data" )
+                            div
+                                span Public IP Address (at alert): 
+                                span=(host.publicIpAddress ? host.publicIpAddress : "No data" )
+                            div
+                                span Private IP Address (at alert): 
+                                span=(host.privateIpAddress ? host.privateIpAddress : "No data" )
+            else 
+                p No data found
+
+
+
+
+
+
+        .tab-pane.fade.in(role="tabpanel" id="update-alert-results" class=(viewData.oldAlert ? 'active' : ''))
+            if !viewData.oldAlert
+                p No data found 
+            else 
+                p SDK query: #{viewData.sdkQuery}
+                p REST query: 
+                    if viewData.restQuery 
+                        | GET 
+                        - var url = "https://developer.microsoft.com/en-us/graph/graph-explorer?request=" + viewData.restQuery + "&method=GET&version=" + viewData.apiVersion + "&GraphUrl=https://graph.microsoft.com"
+                        a(href=url)=viewData.restUrl + viewData.restQuery
+                    else 
+                        | PATCH 
+                        | #{viewData.restUrl + viewData.postRestQuery.query}
+                        p body : #{JSON.stringify(viewData.postRestQuery.body, null, 4)}
+                if viewData.oldAlert 
+                    br
+                    h3 Original alert details
+                    table.table.table-striped.alert-details(cellpadding="10")
+                        thead
+                            tr
+                                th Property 
+                                th Details
+                        tbody
+                            tr
+                                td Title
+                                td=viewData.oldAlert.title
+                            tr
+                                td Category
+                                td=viewData.oldAlert.category
+
+                            tr
+                                td Severity
+                                td=viewData.oldAlert.severity
+                            tr
+                                td Status
+                                td=viewData.oldAlert.status
+                            tr
+                                td Feedback
+                                td=viewData.oldAlert.feedback
+                            tr
+                                td Provider
+                                td=(viewData.oldAlert.vendorInformation ? viewData.oldAlert.vendorInformation.provider : "")
+                            tr
+                                td Assigned To
+                                td=viewData.oldAlert.assignedTo
+                            tr
+                                td Comments
+                                td=viewData.oldAlert.comments
+                if viewData.alert 
+                    hr
+                    br
+                    h3 Updated alert details
+                    table.table.table-striped.alert-details(cellpadding="10")
+                        thead
+                            tr
+                                th Property 
+                                th Details
+                        tbody
+                            tr
+                                td Title
+                                td=viewData.alert.title
+                            tr
+                                td Category
+                                td=viewData.alert.category
+
+                            tr
+                                td Severity
+                                td=viewData.alert.severity
+                            tr
+                                td Status
+                                td=viewData.alert.status
+                            tr
+                                td Feedback
+                                td=viewData.alert.feedback
+                            tr
+                                td Provider
+                                td=(viewData.alert.vendorInformation ? viewData.alert.vendorInformation.provider : "")
+                            tr
+                                td Assigned To
+                                td=viewData.alert.assignedTo
+                            tr
+                                td Comments
+                                td=viewData.alert.comments
