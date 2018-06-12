@@ -18,7 +18,7 @@
     "express-session": "^1.15.6",
     "flash": "^1.1.0",
     "morgan": "^1.7.0",
-    "npm": "^6.0.1",
+    "npm": "^6.1.0",
     "passport": "^0.4.0",
     "passport-azure-ad": "^3.0.12",
     "pug": "^2.0.0-beta6",

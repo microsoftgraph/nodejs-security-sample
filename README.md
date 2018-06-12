@@ -20,7 +20,7 @@ This sample shows how to connect a Node.js app to a Microsoft work or school (Az
 
 To use the Microsoft Graph Connect Sample for Node.js, you need the following:
 
- * [Node.js](https://nodejs.org/) version 4 or 5.
+ * [Node.js](https://nodejs.org/) version >=7.6.0.
 
  * Either a [Microsoft account](https://www.outlook.com/) or a [work or school account](http://dev.office.com/devprogram)
 
@@ -99,6 +99,9 @@ Repeat this action for each user in the organization that is authorized to use a
 4. In a command prompt, run the following command in the root directory. This installs the project dependencies.
 
   ```npm install```
+
+ > **Note:** An error may occur during this process if your
+     machine doesn’t have Python 2.7 installed. If the error occurs, the web app will still work.
 
 5. Run the following command to start the development server.
 

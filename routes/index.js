@@ -229,7 +229,7 @@ function getUserInfo(upn) {
             VIEWDATA.alertUserState = response;
         })
         .catch((err) => {
-            console.log("User info error : ",err);
+            console.log("User info error : ", err);
         });
 }
 
@@ -242,7 +242,7 @@ function getUserPhoto(upn) {
 
         })
         .catch((err) => {
-            console.log("Photo error : ",err);
+            console.log("Photo error : ", err);
         });
 }
 
@@ -325,7 +325,7 @@ router.post('/UpdateAlert', ensureAuthenticated, async (req, res) => {
 
         if (VIEWDATA.oldAlert) { // if the alert exists
             updateForm.assignedTo = await getUserEmail(); // get the current user email
-            VIEWDATA.sdkQuery = "client.api('security/alerts/ "+ alertID + "').patch(UPDATEDDATA, (err, response) => {...});";
+            VIEWDATA.sdkQuery = "client.api('security/alerts/ " + alertID + "').patch(UPDATEDDATA, (err, response) => {...});";
             VIEWDATA.postRestQuery = {
                 query: "security/alerts/" + alertID,
                 body: updateForm
