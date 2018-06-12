@@ -1,4 +1,9 @@
-﻿'use strict';
+﻿/*
+ * Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
+ */
+
+'use strict';
 var debug = require('debug');
 var express = require('express');
 var path = require('path');
