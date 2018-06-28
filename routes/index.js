@@ -330,6 +330,11 @@ router.post('/UpdateAlert', ensureAuthenticated, async (req, res) => {
 
         if (VIEWDATA.oldAlert) { // if the alert exists
             updateForm.assignedTo = await getUserEmail(); // get the current user email
+            
+            //required vendor information from the alert 
+            let vendorInfo = VIEWDATA.oldAlert.vendorInformation;
+            updateForm.vendorInformation = vendorInfo;
+
             VIEWDATA.sdkQuery = "client.api('security/alerts/ " + alertID + "').patch(UPDATEDDATA, (err, response) => {...});";
             VIEWDATA.postRestQuery = {
                 query: "security/alerts/" + alertID,
