@@ -77,3 +77,8 @@ pre {
 .user-info {
     margin: 0 auto;
 }
+
+.btn{
+    white-space:normal !important;
+    min-width:110px;
+}

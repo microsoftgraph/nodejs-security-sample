@@ -28,7 +28,11 @@ form(action="/UpdateAlert" method="post")
             .col-md-6
                 .form-group
                     label(for='comments') Comments 
-                    textArea.form-control(rows = 2, cols = 25, placeholder = "Enter comments" id='comments' name='comments')=(viewData.alert ? viewData.alert.comments : '')
+                    - var commentString = "";
+                    if viewData.alert && viewData.alert.comments
+                        each item in viewData.alert.comments
+                            - commentString += item + "\n";
+                    textArea.form-control(rows = 2, cols = 25, placeholder = "Enter comments" id='comments' name='comments')= commentString
         .row
             .col-md-6
                 .form-group

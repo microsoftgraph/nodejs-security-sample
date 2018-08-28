@@ -1,0 +1,15 @@
+//- Copyright (c) Microsoft Corporation. All rights reserved.
+//- Licensed under the MIT License. 
+
+extends layout
+
+block content
+    h2 Notifications
+    p ISG Subscription notifications will appear on this page.
+    p <b>Note:</b> The page will self-refresh – it may take several seconds for the notification to be displayed.
+
+    div#notifications.panel-group
+
+    script(src="/socket.io/socket.io.js")
+    script(src="/socket.js")
+

@@ -18,9 +18,15 @@ const uuid = require('uuid');
 const config = require('./config.js');
 const session = require('express-session');
 
-var routes = require('./routes/index');
-
 var app = express();
+
+const server = require('http').Server(app)
+const ioServer = require('socket.io')(server);
+module.exports.io = ioServer;
+app.io = ioServer;
+
+var routes = require('./routes/index').router;
+var webhookRoutes = require('./routes/listen').router;
 
 // authentication setup
 const callback = (iss, sub, profile, accessToken, refreshToken, params, done) => {
@@ -68,6 +74,7 @@ app.use(passport.session());
 app.use(require('flash')());
 
 app.use('/', routes);
+app.use('/listen', webhookRoutes);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -102,6 +109,18 @@ if (app.get('env') === 'development') {
 
 app.set('port', process.env.PORT || 3000);
 
-var server = app.listen(app.get('port'), function () {
-    debug('Express server listening on port ' + server.address().port);
-});
+
+
+// var server = app.listen(app.get('port'), function () {
+//     debug('Express server listening on port ' + server.address().port);
+// });
+
+server.listen(app.get('port'));
+debug('Express server listening on port ' + server.address().port);
+
+
+
+
+  
+
+

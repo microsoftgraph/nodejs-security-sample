@@ -5,7 +5,7 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <Name>Nodejs security sample</Name>
     <RootNamespace>ExpressApp1</RootNamespace>
-    <LastActiveSolutionConfig>Release|Any CPU</LastActiveSolutionConfig>
+    <LastActiveSolutionConfig>Debug|Any CPU</LastActiveSolutionConfig>
     <NameOfLastUsedPublishProfile>BuildLab - Web Deploy</NameOfLastUsedPublishProfile>
     <NodeExePath>
     </NodeExePath>
@@ -39,7 +39,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="app.js" />
-    <Compile Include="config-noIDs.js" />
     <Compile Include="config.js" />
     <Compile Include="routes\index.js" />
     <Content Include="public\laptop_icon.png" />
@@ -52,7 +51,6 @@
     <Content Include="views\updateForm.pug">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="Web.config" />
     <Content Include="package.json" />
     <Content Include="public\stylesheets\main.css" />
     <Content Include="README.md" />

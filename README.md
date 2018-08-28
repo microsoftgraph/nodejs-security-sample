@@ -24,6 +24,8 @@ To use the Microsoft Graph Connect Sample for Node.js, you need the following:
 
  * Either a [Microsoft account](https://www.outlook.com/) or a [work or school account](http://dev.office.com/devprogram)
 
+* [Ngrok](https://ngrok.com/download) for webhook notifications.
+
 ## Register the application
 
 1. Sign into the [App Registration Portal](https://apps.dev.microsoft.com/) using either your personal or work or school account.
@@ -87,14 +89,22 @@ This section describes how the Tenant Administrator can authorize specific users
 
 Repeat this action for each user in the organization that is authorized to use applications that call the Microsoft Graph security API. Currently, this permission cannot be granted to security groups.
 
+## Webhook setup
+
+1. Download [ngrok](https://ngrok.com/download).
+2. Follow the installation instructions on the ngrok website.
+3. Run ngrok, if you are using Windows. Run "ngrok.exe http 3000" to start ngrok and open a tunnel to your localhost port 3000.
+4. Then update the `config.js` file with your ngrok url.
+
+    ![Ngrok](readme-images/Ngrok.PNG)
 
 ## Build and run the sample
 
 1. Download or clone the Microsoft Graph Connect Sample for Node.js.
 
-2. Using your favorite IDE, open **config.js** in */utils*.
+2. Using your favorite IDE, open **config.js**.
 
-3. Replace the **clientId** and **clientSecret** placeholder values with the application ID and password that you copied during app registration.
+3. Replace the **clientId** and **clientSecret** placeholder values with the application ID and password that you copied during app registration. Replace **notificationUrl** with your ngrok forwarding url.
 
 4. In a command prompt, run the following command in the root directory. This installs the project dependencies.
 
@@ -115,10 +125,12 @@ Repeat this action for each user in the organization that is authorized to use a
 
 9. Select alerts to view by defining filtering criteria and click on the **Get alerts** button. When the operation completes, the alerts matching your filtering criteria will be displayed on the page. The SDK query and REST query used to make the call are also displayed. 
 Clicking on the REST query link will open a new tab with the **Graph Explorer** pre-populated with your query.
-    >Note: The application is retrieving security alerts from your tenant that match the filter criteria. If there are no matching security alerts from the listed providers, "No matching alerts" will be displayed in the response section. To generate sample alerts from Azure Security Center please see [Security Center Alert Validation](https://docs.microsoft.com/en-us/azure/security-center/security-center-alert-validation)
+    >**Note:** The application is retrieving security alerts from your tenant that match the filter criteria. If there are no matching security alerts from the listed providers, "No matching alerts" will be displayed in the response section. To generate sample alerts from Azure Security Center please see [Security Center Alert Validation](https://docs.microsoft.com/en-us/azure/security-center/security-center-alert-validation)
 
 10. In the list of matching alerts, click on the **Title** of a specific alert you want to view. The complete alert details (JSON) will be displayed in the **Alert Details** tab on the right side of the webpage. If the alert contains the **user principal name** or **fully qualified domain name** properties, the application will make an additional call to Azure Actove Directory via the Microsoft Graph API to retrieve additional details about the user account and the device. Click on **User & device details** tab to view additional user and device data, if it exists.
 11. To update an alert, enter the Alert ID, choose/enter values for the editable properties, and click on the **Update Alert** button. The **Original alert details** and **Updated alert details** are displayed on the **Alert management** tab on the right side of the webpage.
+12. To create a webhooks subscription, select at least one property in any dropdown, or enter a FQDN or UPN. Then click "Subscribe", this will create a webhook subscription. Next click "Notify" to open another page that will display webhook notifications. If a propery matching your webhook subcription resource is updated then a notifiction will be sent to the app and displayed on the notifications page.
+    >**Note:** If you are running the sample on your local machine, you should use [ngrok](#Webhook-setup) to properly create and receive notifications.
 
 ## Questions and comments
 

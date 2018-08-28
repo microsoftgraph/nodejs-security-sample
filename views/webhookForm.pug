@@ -1,0 +1,70 @@
+﻿//- Copyright (c) Microsoft Corporation. All rights reserved.
+//- Licensed under the MIT License. 
+
+-// define mixins
+mixin dropDownItems(label, id, ...items)
+    div(class!=attributes.class)
+        .form-group
+            label(for=id)= label
+            select.form-control(id=id name=id)
+                    each item in items
+                        if viewData.formData && item === viewData.formData[id]
+                            option(value=item selected)= item
+                        else 
+                            option(value=item)= item
+
+mixin textBoxForm(label, id, placeHolder)
+    div(class!=attributes.class)
+        .form-group
+            label(for=id)=label
+            if viewData.formData
+                input.form-control(id=id name=id type="text" placeholder=placeHolder value=viewData.formData[id])
+            else 
+                input.form-control(id=id name=id type="text" placeholder=placeHolder)
+    
+
+form(action="/subscribe" method="post")
+    h2 Subscribe and listen to alert notifications
+    .container-fluid
+        .row 
+            p
+                b Create a new webhook subscription
+        .row
+            +dropDownItems("Category", "category", "All", "abnormalLogin", "accessDenied", "anomalousDataAccess", "anonymousLogin", "antimalwareActionTaken", "azBlackListLogin", "credentialLeakage", "documentDeclassification", "reconnaissance", "exploit", "impossibleTravel", "keyloggerTrojan", "malware", "ransomware", "rdpBruteforce", "reportCompromise", "riskScore", "sensitiveFileExfiltration", "suspiciousActivity", "suspiciousDomain", "suspiciousPowerShell", "threatIntelligence", "unfamiliarLocation", "updateRequired")(class="col-md-3")
+            if !viewData.providers
+                - viewData.providers=['All']
+            else if viewData.providers[0] !== 'All'
+                - viewData.providers.unshift('All')
+            .col-md-3
+                .form-group
+                    label(for="provider") Provider
+                    select.form-control(id="provider", name="provider")
+                        each item in viewData.providers
+                            if viewData.formData && item === viewData.formData["provider"]
+                                option(value=item selected)= item
+                            else 
+                                option(value=item)= item
+            +dropDownItems("Severity", "severity", "All", "High", "Medium", "Low")(class="col-md-2")                 
+        .row
+            +textBoxForm("User Account", "upn", "Enter User Principal Name (UPN)")(class="col-md-5")
+            +textBoxForm("Host Name", "fqdn", "Enter Fully Qualified Domain Name")(class="col-md-5")
+            .col-md-2
+                .form-group
+                    label &nbsp;
+                    button.btn.btn-primary
+                        b.text-center Subscribe
+.container-fluid
+    br
+    .row  
+        .col-md-10
+            p Update the alert that matches the subscription filter and click <b>“Notify”</b>. A notification page will open, self-refresh, and display alert updates. 
+        .col-md-2
+            button.btn.btn-primary(onclick="window.open('/listen')")
+                b.text-center Notify
+    br
+    .row
+        .col-md-10
+            p <b>List active subscriptions</b>
+        .col-md-2
+            a.btn.btn-primary.btn-responsive(href="/subscriptions")
+                b.text-center List subscriptions

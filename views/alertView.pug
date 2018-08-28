@@ -3,16 +3,19 @@
 
 .container-tab
     ul.nav.nav-tabs(role="tablist")
-        li(role="presentation" class=(!viewData.oldAlert ? 'active' : ''))
+        li(role="presentation" class=(!viewData.oldAlert && !viewData.webhook ? 'active' : ''))
             a(href="#alert-metadata" aria-controls="alert-metadata" role="tab" data-toggle="tab") Alert details
         li(role="presentation")
             a(href="#user-device-metadata" aria-controls="user-device-metadata" role="tab" data-toggle="tab") User &amp; device details
         if viewData.oldAlert 
             li(role="presentation" class=(viewData.oldAlert ? 'active' : ''))
                 a(href="#update-alert-results" aria-controls="update-alert-results" role="tab" data-toggle="tab") Alert management
+        if viewData.webhook 
+            li(role="presentation" class=(viewData.webhook ? 'active' : ''))
+                a(href="#subscription-results" aria-controls="subscription-results" role="tab" data-toggle="tab") Subscription details
 
     .tab-content
-        .tab-pane.fade.in(role="tabpanel" id="alert-metadata" class=(!viewData.oldAlert ? 'active' : ''))
+        .tab-pane.fade.in(role="tabpanel" id="alert-metadata" class=(!viewData.oldAlert && !viewData.webhook ? 'active' : ''))
             if !viewData.sdkQuery && !viewData.restQuery 
                 span No alert selected
             else 
@@ -22,7 +25,7 @@
                         | GET 
                         - var url = "https://developer.microsoft.com/en-us/graph/graph-explorer?request=" + viewData.restQuery + "&method=GET&version=" + viewData.apiVersion + "&GraphUrl=https://graph.microsoft.com"
                         a(href=url)=viewData.restUrl + viewData.restQuery
-                    else 
+                    else if viewData.postRestQuery
                         | PATCH 
                         | #{viewData.restUrl + viewData.postRestQuery.query}
                         p body : #{JSON.stringify(viewData.postRestQuery.body, null, 4)}
@@ -35,8 +38,9 @@
             if viewData.alert && viewData.alertUserState 
                 .row
                     .col-md-2.profile-picture
-                        if viewData.alertUserPhoto
-                            img(src=("data:image/png;base64," + viewData.alertUserPhoto.toString('base64')) width='100' height='100')
+                        if viewData.alertUserPhoto                            
+                            //- + viewData.alertUserPhoto.toString('base64')
+                            img(src=("data:image/png;base64," + viewData.alertUserPhoto) width='100' height='100')
                         else
                             p No photo available
                     .col-md-9.user-info
@@ -143,7 +147,7 @@
                                 td=viewData.oldAlert.assignedTo
                             tr
                                 td Comments
-                                td=viewData.oldAlert.comments
+                                td [#{viewData.oldAlert.comments}]
                 if viewData.alert 
                     hr
                     br
@@ -178,4 +182,56 @@
                                 td=viewData.alert.assignedTo
                             tr
                                 td Comments
-                                td=viewData.alert.comments
+                                td [#{viewData.alert.comments}]
+
+        .tab-pane.fade.in(role="tabpanel" id="subscription-results" class=(viewData.webhook ? 'active' : ''))
+            if !viewData.webhook
+                p No data found 
+            else 
+                if 'POST' in viewData.webhook
+                    p Webhook subscription created:
+
+                p <b>SDK query:</b> #{viewData.sdkQuery}
+                p <b>REST query:</b> 
+                    if viewData.restQuery 
+                        | GET 
+                        - var url = "https://developer.microsoft.com/en-us/graph/graph-explorer?request=" + viewData.restQuery + "&method=GET&version=" + viewData.apiVersion + "&GraphUrl=https://graph.microsoft.com"
+                        a(href=url)=viewData.restUrl + viewData.restQuery
+                    else 
+                        | POST 
+                        | #{viewData.restUrl + viewData.postRestQuery.query}
+                        p body : 
+                        pre #{JSON.stringify(viewData.postRestQuery.body, null, 2)}
+                if 'GET' in viewData.webhook
+                    - var subscriptions  = viewData.webhook.GET.value
+                    if subscriptions.length === 0
+                        p No subscriptions found 
+                    else 
+                        h3 Subscription details
+                        each sub in subscriptions
+                            table.table.table-striped.alert-details(cellpadding="10")
+                                thead
+                                    tr
+                                        th Property 
+                                        th Details
+                                tbody
+                                    each val, prop in sub                                
+                                        tr
+                                            td=prop
+                                            td=val
+                if 'POST' in viewData.webhook
+                    - var subscriptions  = viewData.webhook.POST
+                    if subscriptions.length === 0
+                        p No subscriptions found 
+                    else 
+                        h3 Subscription details
+                        table.table.table-striped.alert-details(cellpadding="10")
+                            thead
+                                tr
+                                    th Property 
+                                    th Details
+                            tbody
+                                each val, prop in subscriptions
+                                    tr
+                                        td=prop
+                                        td=val
