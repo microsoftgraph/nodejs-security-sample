@@ -12,7 +12,7 @@ const config = require('../config.js');
 const os = require("os");
 
 
-const APIVERSION = "testSecurityDev";
+const APIVERSION = "beta";
 
 var client = null; // Graph Client
 
