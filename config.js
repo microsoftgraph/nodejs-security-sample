@@ -7,8 +7,8 @@
 module.exports = {
     creds: {
         redirectUrl: 'http://localhost:3000/token',
-        clientID: 'e4a35c9e-f8ab-4f43-9c04-d1e65bf9b10a',
-        clientSecret: 'skafPG67#;+wyzYQEIU429-',
+        clientID: 'ENTER YOUR APP ID HERE',
+        clientSecret: 'ENTER YOUR APP SECRET HERE',
         identityMetadata: 'https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration',
         allowHttpForRedirectUrl: true, // For development only
         responseType: 'code',
@@ -18,7 +18,7 @@ module.exports = {
     },
     webhook : {
         changeType: 'updated',
-        notificationUrl: 'https://a1897347.ngrok.io/listen', 
+        notificationUrl: 'https://{ENTER YOUR NGROK PUBLIC URL HERE}/listen', 
         resource: 'security/alerts',
         clientState: 'cLIENTsTATEfORvALIDATION' // *
     }
