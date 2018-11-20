@@ -9,7 +9,7 @@ block content
     .col-md-7
         h4 Your Tenant admin has not given consent to this application. 
         P This application requires 
-            | <code>'SecurityEvents.Read.All', 'SecurityEvents.ReadWrite.All', and 'User.Read.All'</code> 
+            | <code>'SecurityEvents.ReadWrite.All', and 'User.Read.All'</code> 
             | permissions to access the Secuirty API, You currently have <code>'#{viewData.scopes}'</code> 
             | permissions. 
 
@@ -27,9 +27,9 @@ block content
     
         hr
 
-        p #[b If your tenant admin has given consent], Then you are missing the #[em 'SecurityEvents.Read.All', 'SecurityEvents.ReadWrite.All', or 'User.Read.All'] 
+        p #[b If your tenant admin has given consent], Then you are missing the #[em 'SecurityEvents.ReadWrite.All' or 'User.Read.All'] 
             | permissions in your app registration. Please go to 
             a(href="https://apps.dev.microsoft.com") https://apps.dev.microsoft.com,
-            | to add #[em 'SecurityEvents.Read.All', 'SecurityEvents.ReadWrite.All' and 'User.Read.All'] to the delegated permissions in your application. 
+            | to add #[em 'SecurityEvents.ReadWrite.All' and 'User.Read.All'] to the delegated permissions in your application. 
             | then have the admin consent to the updated permissions.
         

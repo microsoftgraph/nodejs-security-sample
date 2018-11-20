@@ -12,7 +12,7 @@ const config = require('../config.js');
 const os = require("os");
 
 
-const APIVERSION = "beta";
+const APIVERSION = "v1.0";
 
 var client = null; // Graph Client
 
@@ -89,7 +89,7 @@ router.get('/token', (req, res, next) => {
 
 // check the scopes to make sure the all the required scopes are contained in the accesss token
 function checkScopes(req, res, scopes, next) {
-    if (scopes.includes('User.Read.All') && (scopes.includes('SecurityEvents.Read.All') && scopes.includes('SecurityEvents.ReadWrite.All'))) {
+    if (scopes.includes('User.Read.All') && scopes.includes('SecurityEvents.ReadWrite.All')) {
         req.session.missingScopes = false;
         next();
     } else {
