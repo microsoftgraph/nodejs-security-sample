@@ -4,13 +4,12 @@
  */
 
 'use strict';
-var debug = require('debug');
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+const debug = require('debug');
+const express = require('express');
+const path = require('path');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 
 const passport = require('passport');
 const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
@@ -18,7 +17,7 @@ const uuid = require('uuid');
 const config = require('./config.js');
 const session = require('express-session');
 
-var app = express();
+const app = express();
 
 const server = require('http').Server(app)
 const ioServer = require('socket.io')(server);
@@ -78,7 +77,7 @@ app.use('/listen', webhookRoutes);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-    var err = new Error('Not Found');
+    const err = new Error('Not Found');
     err.status = 404;
     next(err);
 });
