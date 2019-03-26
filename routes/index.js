@@ -256,6 +256,7 @@ function getUserPhoto(req, upn) {
         .version('beta')    
         .get()
         .then((response) => {
+            console.log(response);
             req.session.VIEWDATA.alertUserPhoto = response.toString('base64');
         })
         .catch((err) => {

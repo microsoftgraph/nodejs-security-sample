@@ -10,21 +10,21 @@
     "name": "Edward Koval"
   },
   "dependencies": {
-    "@microsoft/microsoft-graph-client": "^1.0.0",
+    "@microsoft/microsoft-graph-client": "^1.4.0",
     "body-parser": "^1.18.3",
-    "cookie-parser": "^1.4.0",
+    "cookie-parser": "^1.4.4",
+    "cryptiles": ">=4.1.2",
     "debug": "^2.2.0",
-    "express": "^4.14.0",
+    "express": "^4.16.4",
     "express-session": "^1.15.6",
     "flash": "^1.1.0",
-    "morgan": "^1.7.0",
-    "npm": "^6.2.0",
+    "morgan": "^1.9.1",
+    "npm": "^6.8.0",
     "passport": "^0.4.0",
     "passport-azure-ad": "^3.0.12",
     "pug": "^2.0.0-beta6",
     "serve-favicon": "^2.3.0",
-    "socket.io": "^2.1.1",
-    "uuid": "^3.2.1",
-    "cryptiles": ">=4.1.2"
+    "socket.io": "^2.2.0",
+    "uuid": "^3.3.2"
   }
 }
