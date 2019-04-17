@@ -10,7 +10,7 @@ block content
         h4 Your Tenant admin has not given consent to this application. 
         P This application requires 
             | <code>'SecurityEvents.ReadWrite.All', and 'User.Read.All'</code> 
-            | permissions to access the Secuirty API, You currently have <code>'#{viewData.scopes}'</code> 
+            | permissions to access the Security API, You currently have <code>'#{session.scopes}'</code> 
             | permissions. 
 
         - var adminPage = "https://login.microsoftonline.com/common/adminconsent?client_id=" + viewData.appId + "&redirect_uri=" + viewData.redirectUri
@@ -28,8 +28,8 @@ block content
         hr
 
         p #[b If your tenant admin has given consent], Then you are missing the #[em 'SecurityEvents.ReadWrite.All' or 'User.Read.All'] 
-            | permissions in your app registration. Please go to 
-            a(href="https://apps.dev.microsoft.com") https://apps.dev.microsoft.com,
+            | permissions in your app registration. Please go to "API permissions" on 
+            a(href="https://go.microsoft.com/fwlink/?linkid=2083908") https://go.microsoft.com/fwlink/?linkid=2083908,
             | to add #[em 'SecurityEvents.ReadWrite.All' and 'User.Read.All'] to the delegated permissions in your application. 
             | then have the admin consent to the updated permissions.
         

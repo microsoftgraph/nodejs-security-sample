@@ -31,15 +31,15 @@ form(action="/subscribe" method="post")
                 b Create a new webhook subscription
         .row
             +dropDownItems("Category", "category", "All", "abnormalLogin", "accessDenied", "anomalousDataAccess", "anonymousLogin", "antimalwareActionTaken", "azBlackListLogin", "credentialLeakage", "documentDeclassification", "reconnaissance", "exploit", "impossibleTravel", "keyloggerTrojan", "malware", "ransomware", "rdpBruteforce", "reportCompromise", "riskScore", "sensitiveFileExfiltration", "suspiciousActivity", "suspiciousDomain", "suspiciousPowerShell", "threatIntelligence", "unfamiliarLocation", "updateRequired")(class="col-md-3")
-            if !viewData.providers
-                - viewData.providers=['All']
-            else if viewData.providers[0] !== 'All'
-                - viewData.providers.unshift('All')
+            if !session.providers
+                - session.providers=['All']
+            else if session.providers[0] !== 'All'
+                - session.providers.unshift('All')
             .col-md-3
                 .form-group
                     label(for="provider") Provider
                     select.form-control(id="provider", name="provider")
-                        each item in viewData.providers
+                        each item in session.providers
                             if viewData.formData && item === viewData.formData["provider"]
                                 option(value=item selected)= item
                             else 

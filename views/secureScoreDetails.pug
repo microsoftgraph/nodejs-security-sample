@@ -1,0 +1,75 @@
+//- Copyright (c) Microsoft Corporation. All rights reserved.
+//- Licensed under the MIT License. 
+
+b REST Query: 
+- var url = "https://developer.microsoft.com/en-us/graph/graph-explorer?request=security/secureScores?$top=1&method=GET&version=" + viewData.apiVersion + "&GraphUrl=https://graph.microsoft.com"
+    a(href=url)=viewData.restUrl + "security/secureScores?$top=1"
+hr
+
+-var score = session.secureScores.value[0]
+.row 
+    .col-sm-4
+        b Secure Score: 
+        span #{score.currentScore}
+        br
+        br
+        b Enabled Services: 
+        p 
+            if score.enabledServices.length > 0
+                each service in score.enabledServices
+                    //- #{score.enabledServices}
+                    span #{service.replace("Has", "")}, 
+            else
+                span None
+
+        br
+        br
+        b Licensed user count: 
+        span #{score.licensedUserCount}
+    .col-sm-4
+        b Max Secure Score: 
+        span #{score.maxScore}
+        br
+        br
+        br
+        br
+        b Active user count: 
+        span #{score.activeUserCount}
+    .col-sm-4
+        b Score Date: 
+        span #{score.createdDateTime}
+        br
+        br
+        br
+        br
+        b ID: 
+        span #{score.id}
+hr
+.row
+    .panel.panel-default
+        .panel-heading Secure Score Control Scores
+        .panel-body
+            .table-responsive.rounded
+                table.table.table-condensed.table-striped
+                    thead
+                        tr
+                            th Category
+                            th Name
+                            th Description
+                            th Score
+                            th Count / Total
+                    tbody 
+                        each controlScore in score.controlScores
+                            tr 
+                                td #{controlScore.controlCategory}
+                                td #{controlScore.controlName}
+                                td #{controlScore.description}
+                                td #{controlScore.score}
+                                td #{controlScore.count ? controlScore.count : 0} / #{controlScore.total ? controlScore.total : controlScore.on}
+
+
+button.btn.btn-primary(data-toggle="collapse" data-target="#RawJson2")
+    b Show JSON Response
+
+.collapse#RawJson2   
+    pre #{JSON.stringify(session.secureScores, null, 2)}

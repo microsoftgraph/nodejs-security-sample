@@ -30,15 +30,15 @@ form(action="/GetAlerts" method="post")
             +dropDownItems("Top X", "top", 1, 5, 10, 20)(class="col-md-2")
             +dropDownItems("Category", "category", "All", "abnormalLogin", "accessDenied", "anomalousDataAccess", "anonymousLogin", "antimalwareActionTaken", "azBlackListLogin", "credentialLeakage", "documentDeclassification", "reconnaissance", "exploit", "impossibleTravel", "keyloggerTrojan", "malware", "ransomware", "rdpBruteforce", "reportCompromise", "riskScore", "sensitiveFileExfiltration", "suspiciousActivity", "suspiciousDomain", "suspiciousPowerShell", "suspiciousActivity", "threatIntelligence", "unfamiliarLocation", "updateRequired")(class="col-md-3")
             +dropDownItems("Status", "status", "All", "NewAlert", "InProgress", "Resolved")(class="col-md-2")
-            if !viewData.providers
-                - viewData.providers=['All']
-            else if viewData.providers[0] !== 'All'
-                - viewData.providers.unshift('All')
+            if !session.providers
+                - session.providers=['All']
+            else if session.providers[0] !== 'All'
+                - session.providers.unshift('All')
             .col-md-3
                 .form-group
                     label(for="provider") Provider
                     select.form-control(id="provider", name="provider")
-                        each item in viewData.providers
+                        each item in session.providers
                             if viewData.formData && item === viewData.formData["provider"]
                                 option(value=item selected)= item
                             else 

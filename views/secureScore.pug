@@ -1,0 +1,23 @@
+//- Copyright (c) Microsoft Corporation. All rights reserved.
+//- Licensed under the MIT License. 
+
+if session.secureScores && session.secureScores.value.length > 0
+    - var scores = session.secureScores.value[0]
+    .container
+        h3.text-center Secure score overview
+        .row
+            .col-sm
+                h5.text-center Secure Score
+                h5.text-center #{scores.currentScore} / #{scores.maxScore}
+        .row
+            .col-sm
+                .progress
+                    - var percent = scores.currentScore/scores.maxScore *100
+                    .progress-bar(role='progressbar' style="width: " + percent + "%" aria-valuenow=percent aria-valuemin="0" aria-valuemax=scores.maxScore ) 
+        .row.justify-content-center
+            .col-md-auto
+                a(href="/secureScore" class="btn btn-primary")
+                    b Score Details
+
+    hr
+

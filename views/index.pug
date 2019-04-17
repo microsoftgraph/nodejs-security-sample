@@ -6,15 +6,24 @@ extends layout
 block content
     h1.text-center= title
     hr
+    if !viewData.secureScoreProfiles
+        include ./secureScore.pug
+
     .container-fluid
         .row
-            .col-md-7
-                include ./alertForm.pug
-                hr
-                include ./updateForm.pug
-                hr
-                include ./webhookForm.pug
+            .col-md-6
+                if !viewData.secureScoreProfiles
+
+                    include ./alertForm.pug
+                    hr
+                    include ./updateForm.pug
+                    hr
+                    include ./webhookForm.pug
+                    //- if "SecurityActions.ReadWrite.All" in session.scopes
+                    include ./securityActionsForm.pug
+                else 
+                    include ./secureScoreDetails.pug
                 
-            .col-md-5
+            .col-md-6
                 include ./alertView.pug
 

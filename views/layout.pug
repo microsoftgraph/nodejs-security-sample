@@ -25,17 +25,17 @@ html
                             span.icon-bar
                             span.icon-bar
                             span.icon-bar
-                        a.navbar-brand(href="/") Microsoft Graph Security API
+                        a.navbar-brand(href="/Alerts") Microsoft Graph Security API
                     div.navbar-collapse.collapse
                         ul.nav.navbar-nav
                             li
-                                a(href='/') Home
-                        if viewData
-                            if viewData.user
+                                a(href='/Alerts') Home
+                        if session
+                            if session.user
                                 ul.nav.navbar-nav.navbar-right
                                     li.navbar-text
                                         -// var name = user.profile.displayName
-                                        | Hello,  #{viewData.user.profile.displayName}
+                                        | Hello,  #{session.user.profile.displayName}
                                     li
                                         a.nav-link(href="logout") Sign Out        
                             else
@@ -50,9 +50,11 @@ html
                         span(aria-hidden="true") &times;
                     p !{message.message}
             block content
-
+                
         footer.container-fluid
             hr
+            p.text-center Read the API docs: 
+                    a(href="https://docs.microsoft.com/graph/api/resources/security-api-overview") https://docs.microsoft.com/graph/api/resources/security-api-overview
             - var currentDate = new Date().getFullYear()
             p &copy; #{currentDate} - #{title}
         

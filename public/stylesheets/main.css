@@ -81,4 +81,7 @@ pre {
 .btn{
     white-space:normal !important;
     min-width:110px;
+    word-wrap: break-word;
+    display: inline-block;
+    height:100%;
 }

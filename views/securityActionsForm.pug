@@ -1,0 +1,55 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. 
+
+hr
+form(action="/Actions" method="post")
+    h2 Remediation action
+    .container-fluid
+        .row
+            .col-md-3
+                .form-group
+                    label(for='SelectAction') Action
+                    select.form-control(id='SelectAction' name='SelectAction' required)
+                        option(value="" disabled selected) Select Action
+                        each item in ["Allow", "Block"]
+                            if viewData.alert && viewData.alert.status && item.toLowerCase() === viewData.alert.status.toLowerCase()
+                                option(value=item selected)= item
+                            else 
+                                option(value=item)= item
+                
+            .col-md-3
+                .form-group
+                    label(for='propertyName') Property Name
+                    input.form-control(id='propertyName' name='propertyName' type="text" placeholder="Enter property name" )
+
+            .col-md-3
+                .form-group
+                    label(for='propertyValue') Property Value 
+                    input.form-control(id='propertyValue' name='propertyValue' type="text" placeholder="Enter property value" )
+        .row
+            .col-md-3
+                .form-group
+                    if session.providers[0] == 'All'
+                        - session.providers.shift()
+                    label(for="provider") Provider
+                    select.form-control(id="provider", name="provider" required)
+                        option(value="" disabled selected) Select a provider
+                        each item in session.providers
+                            if viewData.formData && item === viewData.formData["provider"]
+                                option(value=item selected)= item
+                            else 
+                                option(value=item)= item
+            .col-md-6
+                .form-group
+                    label(for='reason') Reason
+                    textArea.form-control(rows = 3, cols = 25, placeholder = "Enter reason" id='reason' name='reason')
+            .col-md-1
+            .col-md-2
+                .form-group
+                    label &nbsp;
+                    button.btn.btn-primary.btn-responsive.form-control
+                        b.text-center Invoke action
+                
+                label &nbsp;
+                a.btn.btn-primary.btn-responsive(role="button" href="/Actions")
+                    b.text-center List actions
