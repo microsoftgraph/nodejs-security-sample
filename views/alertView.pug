@@ -3,7 +3,7 @@
 
 .container-tab
     ul.nav.nav-tabs(role="tablist")
-        li(role="presentation" class=(!viewData.oldAlert && !viewData.webhook ? 'active' : ''))
+        li(role="presentation" class=(!viewData.oldAlert && !viewData.webhook && !viewData.secureScoreProfiles && !viewData.securityActions ? 'active' : ''))
             a(href="#alert-metadata" aria-controls="alert-metadata" role="tab" data-toggle="tab") Alert details
         li(role="presentation")
             a(href="#user-device-metadata" aria-controls="user-device-metadata" role="tab" data-toggle="tab") User &amp; device details
@@ -13,9 +13,15 @@
         if viewData.webhook 
             li(role="presentation" class=(viewData.webhook ? 'active' : ''))
                 a(href="#subscription-results" aria-controls="subscription-results" role="tab" data-toggle="tab") Subscription details
+        if viewData.secureScoreProfiles 
+            li(role="presentation" class=(viewData.secureScoreProfiles ? 'active' : ''))
+                a(href="#control-profile-results" aria-controls="control-profile-results" role="tab" data-toggle="tab") Control Scores
+        if viewData.securityActions 
+            li(role="presentation" class=(viewData.securityActions ? 'active' : ''))
+                a(href="#action-results" aria-controls="action-results" role="tab" data-toggle="tab") Security Actions
 
     .tab-content
-        .tab-pane.fade.in(role="tabpanel" id="alert-metadata" class=(!viewData.oldAlert && !viewData.webhook ? 'active' : ''))
+        .tab-pane.fade.in(role="tabpanel" id="alert-metadata" class=(!viewData.oldAlert && !viewData.webhook && !viewData.secureScoreProfiles && !viewData.securityActions ? 'active' : ''))
             if !viewData.sdkQuery && !viewData.restQuery 
                 span No alert selected
             else 
@@ -26,7 +32,10 @@
                         - var url = "https://developer.microsoft.com/en-us/graph/graph-explorer?request=" + viewData.restQuery + "&method=GET&version=" + viewData.apiVersion + "&GraphUrl=https://graph.microsoft.com"
                         a(href=url)=viewData.restUrl + viewData.restQuery
                     else if viewData.postRestQuery
-                        | PATCH 
+                        if viewData.postRestQuery.method
+                            | #{viewData.postRestQuery.method} 
+                        else 
+                            | PATCH 
                         | #{viewData.restUrl + viewData.postRestQuery.query}
                         p body : #{JSON.stringify(viewData.postRestQuery.body, null, 4)}
                 if viewData.alertErr
@@ -235,3 +244,115 @@
                                     tr
                                         td=prop
                                         td=val
+
+        .tab-pane.fade.in(role="tabpanel" id="control-profile-results" class=(viewData.secureScoreProfiles ? 'active' : ''))
+            if !viewData.secureScoreProfiles
+                p No data found 
+            else 
+                p <b>SDK query:</b> #{viewData.sdkQuery}
+                p <b>REST query:</b> 
+                    if viewData.restQuery 
+                        | GET 
+                        - var url = "https://developer.microsoft.com/en-us/graph/graph-explorer?request=" + viewData.restQuery + "&method=GET&version=" + viewData.apiVersion + "&GraphUrl=https://graph.microsoft.com"
+                        a(href=url)=viewData.restUrl + viewData.restQuery 
+                    else 
+                        | POST 
+                        | #{viewData.restUrl + viewData.postRestQuery.query}
+                        p body : 
+                        pre #{JSON.stringify(viewData.postRestQuery.body, null, 2)}
+                .container-fluid
+                    h3 Secure Score Control Profiles
+                    p Drill down into the Secure Score Control Profiles and monitor corrective actions. 
+                    hr
+                    .table-responsive.rounded
+                        table.table.table-hover
+                            thead.thead-light
+                                tr
+                                    th Control
+                                    th Rank
+                                    th Title
+                                    th Max Scores
+                                    th User Impact
+                                    th Implementation Cost
+                            tbody
+                                each profile in viewData.secureScoreProfiles.value
+                                        tr(data-toggle="collapse" data-target="#profile" + profile.id)
+                                            td #{profile.id}
+                                            td #{profile.rank}
+                                            td #{profile.title}
+                                            td #{profile.maxScore}
+                                            td #{profile.userImpact}
+                                            td #{profile.implementationCost}
+                                        tr.collapse(id="profile" + profile.id)
+                                            td(colspan='6' margin="0px") 
+                                                pre #{JSON.stringify(profile, null, 2)}
+                button.btn.btn-primary(data-toggle="collapse" data-target="#RawJson1")
+                    b Show JSON Response
+
+                .collapse#RawJson1    
+                    .panel-body 
+                        pre #{JSON.stringify(viewData.secureScoreProfiles, null, 2)}
+
+        .tab-pane.fade.in(role="tabpanel" id="action-results" class=(viewData.securityActions ? 'active' : ''))
+            if !viewData.securityActions
+                p No data found 
+            else 
+                if 'POST' in viewData.securityActions
+                    h3 Security Action Created
+                    b API request: 
+
+                p <b>SDK query:</b> #{viewData.sdkQuery}
+                p <b>REST query:</b> 
+                    if viewData.restQuery 
+                        | GET 
+                        - var url = "https://developer.microsoft.com/en-us/graph/graph-explorer?request=" + viewData.restQuery + "&method=GET&version=" + viewData.apiVersion + "&GraphUrl=https://graph.microsoft.com"
+                        a(href=url)=viewData.restUrl + viewData.restQuery
+                    else 
+                        | POST 
+                        | #{viewData.restUrl + viewData.postRestQuery.query}
+                        br
+                        p 
+                            b body : 
+                            pre #{JSON.stringify(viewData.postRestQuery.body, null, 2)}
+                if 'GET' in viewData.securityActions
+                    - var actions  = viewData.securityActions.GET
+                    if actions.length === 0
+                        p No actions found 
+                    else 
+                        h3 Security Action details
+                        .table-responsive.rounded
+                            table.table.table-hover.table-striped(cellpadding="10")
+                                thead
+                                    tr
+                                        th Action Id 
+                                        th Status
+                                        th Action Name
+                                tbody
+                                    each item in actions
+                                        tr(data-toggle="collapse" data-target="#" + item.id)
+                                            td= item.id
+                                            td= item.status
+                                            td= item.name
+
+                                        tr.collapse(id= item.id)
+                                            td(colspan='3' margin="0px")
+                                                pre #{JSON.stringify(item, null, 2)}
+
+                if 'POST' in viewData.securityActions
+                    - var actions  = viewData.securityActions.POST
+                    if actions.length === 0
+                        p No actions found 
+                    else 
+                        .table-responsive.rounded
+                            table.table.table-striped.alert-details(cellpadding="10")
+                                tbody
+                                    each val, prop in actions
+                                        tr
+                                            td 
+                                                b API Response: 
+                                                pre= JSON.stringify(val, null, 2)
+
+                
+
+               
+                            

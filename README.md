@@ -28,36 +28,34 @@ To use the Microsoft Graph Connect Sample for Node.js, you need the following:
 
 ## Register the application
 
-1. Sign into the [App Registration Portal](https://apps.dev.microsoft.com/) using either your personal or work or school account.
+To configure the samples, you'll need to register a new application in the Microsoft [Application Registration Portal](https://go.microsoft.com/fwlink/?linkid=2083908).
 
-2. Choose **Add an app**.
+Follow these steps to register a new application:
 
-3. Enter a name for the app, and choose **Create application**. 
-	
-   The registration page displays, listing the properties of your app.
+1. Sign in to the [Application Registration Portal](https://go.microsoft.com/fwlink/?linkid=2083908) using either your personal or work or school account.
 
-4. Copy the Application Id. This is the unique identifier for your app. 
+2. Choose **New registration**. Enter *http://localhost:3000/token* as the Redirect URI.
 
-5. Under **Application Secrets**, choose **Generate New Password**. Copy the password from the **New password generated** dialog.
+3. Enter a name for the app, and select **Register**.
+    > **Note:** If you would like your application to be multi-tenanted, select `Accounts in any organizational directory` in the **Supported account types** section.
 
-   You'll use the application ID and password (secret) to configure the sample app in the next section. 
+4. Next you'll see the overview page for your app. Copy and save the **Application Id** field. You will need it later to complete the configuration process.
 
-6. Under **Platforms**, choose **Add Platform**.
+5. Under **Certificates & secrets**, choose **New client secret** and add a quick description. A new secret will be displayed in the **Value** column. Copy this password. You will need it later to complete the configuration process.
 
-7. Choose **Web**.
+6. Under **API permissions**, choose **Add a permission** > **Microsoft Graph**.
 
-8. Enter *http://localhost:3000/token* as the Redirect URI.
-
-9. Under **Microsoft Graph Permissions**, choose **Delegated Permissions**, Add **SecurityEvents.Read.All**, **SecurityEvents.ReadWrite.All** and **User.Read.All**. These permissions will allow the sample application to read and modify security events (alerts) and to retrieve information about users from Azure Active Directory via the Microsoft Graph API.
-
-10. Choose **Save**.
+7. Under **Delegated Permissions**, add the permissions/scopes required for the sample. This sample requires **User.Read.All**,  **SecurityEvents.ReadWrite.All**, and **SecurityActions.ReadWrite.All** permissions.
+    >**Note**: See the [Microsoft Graph permissions reference](https://developer.microsoft.com/en-us/graph/docs/concepts/permissions_reference) for more information about Graph's permission model.
 
 ## Grant Admin consent to view Security data
+
 ### Assign Scope (permission)
+
 1. Provide your Administrator the **Application Id** and the **Redirect URI** that you used in the previous steps. The organization’s Azure Active Directory Tenant Administrator is required to grant the required consent (permissions) to the application.
-2.	As the Tenant Administrator for your organization, open a browser window and paste the following URL in the address bar (after adding values for APPLICATION_ID and REDIRECT_URL):
+2. As the Tenant Administrator for your organization, open a browser window and paste the following URL in the address bar (after adding values for APPLICATION_ID and REDIRECT_URL):
 https://login.microsoftonline.com/common/adminconsent?client_id=APPLICATION_ID&state=12345&redirect_uri=REDIRECT_URL.
-3.	After authenticating, the Tenant Administrator will be presented with a dialog like the following (depending on the permissions the application is requesting):
+3. After authenticating, the Tenant Administrator will be presented with a dialog like the following (depending on the permissions the application is requesting):
 
      ![Scope consent dialog](readme-images/Scope.PNG)
 

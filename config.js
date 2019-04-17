@@ -7,8 +7,8 @@
 module.exports = {
     creds: {
         redirectUrl: 'http://localhost:3000/token',
-        clientID: 'ENTER YOUR APP ID HERE',
-        clientSecret: 'ENTER YOUR APP SECRET HERE',
+        clientID: '{ENTER_YOUR_APPLICATION_ID_HERE}',
+        clientSecret: '{ENTER_YOUR_APPLICATION_SECRET_HERE}',
         identityMetadata: 'https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration',
         allowHttpForRedirectUrl: true, // For development only
         responseType: 'code',
@@ -20,11 +20,11 @@ module.exports = {
         changeType: 'updated',
         notificationUrl: 'https://{ENTER YOUR NGROK PUBLIC URL HERE}/listen', 
         resource: 'security/alerts',
-        clientState: 'cLIENTsTATEfORvALIDATION' // *
+        clientState: 'cLIENTsTATEfORvALIDATION' // **
     }
 };
 
-// * Setting this property will allow you to confirm that notifications 
+// ** Setting this property will allow you to confirm that notifications 
 // you receive originate from the Microsoft Graph service. For this reason, 
 // the value of the property should remain secret and known only to your 
 // application and the Microsoft Graph service.

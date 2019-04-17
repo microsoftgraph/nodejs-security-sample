@@ -20,8 +20,6 @@ const RESTURL = "https://graph.microsoft.com/" + APIVERSION + "/";
 const TITLE = 'Microsoft Graph Security API Demo';
 
 
-
-
 // Homepage
 router.get('/', (req, res) => {
     // Used to pass data to the UI
@@ -31,9 +29,9 @@ router.get('/', (req, res) => {
 
     // check if user has the correct delegated scopes to run the app
     if (req.session.missingScopes) {
-        res.render('admin', { title: TITLE, viewData: req.session.VIEWDATA });
+        res.render('admin', { title: TITLE, viewData: req.session.VIEWDATA, session: req.session});
     } else {
-        res.render('index', { title: TITLE, viewData: req.session.VIEWDATA });
+        res.render('index', { title: TITLE, viewData: req.session.VIEWDATA, session: req.session });
     }
   });
 
@@ -44,10 +42,12 @@ router.get('/login',
         res.redirect('/');
     });
 
+    
 // Authentication callback.
 // After we have an access token, get user data and check the scopes returned.
 router.get('/token', (req, res, next) => {
     // Checks if the redirect was from the authentication or the admin consent flow.
+    req.session.VIEWDATA = {};
     if (req.query.error) {
         let message = '<strong>Error:</strong> ' + req.query.error + '</br> <strong>Reason:</strong> ' + req.query.error_description;
         res.flash('danger', message);
@@ -67,14 +67,15 @@ router.get('/token', (req, res, next) => {
         // save the scopes returned by Azure AD
         var scopesReturned = req.user.params['scope'];
 
-        req.session.VIEWDATA.user = req.user;
+        req.session.user = req.user;
         scopesReturned = scopesReturned.split(" ");
-        req.session.VIEWDATA.scopes = scopesReturned;
+        req.session.scopes = scopesReturned;
         req.session.VIEWDATA.apiVersion = APIVERSION; // used for graph explorer link 
         req.session.VIEWDATA.restUrl = RESTURL;
+        console.log(scopesReturned);
 
         // verify that the correct scopes are in the token
-        checkScopes(req, res, scopesReturned, () => {
+        checkScopes(req, res, scopesReturned, async () => {
             client = MicrosoftGraph.Client.init({
                 defaultVersion: APIVERSION,  // Security API is currently in beta
                 debugLogging: true,
@@ -83,6 +84,8 @@ router.get('/token', (req, res, next) => {
                 }
             });
             module.exports.client = client;
+            await getSecureScores(req)
+            // await getSecureScoreProfiles(req)
             res.redirect('/providers');
         });
     });
@@ -100,31 +103,47 @@ function checkScopes(req, res, scopes, next) {
     }
 }
 
+
 // get all the providers for the current tenant
 router.get('/providers', ensureAuthenticated, (req, res) => {
-    client.api('security/alerts').top(1).get((err, response) => {
-        if (err) {
+    client.api('security/alerts')
+        .top(1)
+        .get()
+        .then((response) => {
+            var values = response['value'];
+            var vendorInfo = {};
+            var providers = [];
+            values.forEach((v) => {
+                vendorInfo[v.vendorInformation.provider] = v.vendorInformation;
+                providers.push(v.vendorInformation.provider)
+            });
+
+            req.session.providers = providers;
+            req.session.vendorInfo = vendorInfo;
+            console.log(providers);
+
+            res.redirect('/');
+        }).catch((err) => {
             console.log(err);
             renderError(err, res);
-        } else {
-            var providers = response.value.map((v) => {
-                return v.vendorInformation.provider;
-            });
-            req.session.VIEWDATA.providers = providers;
-            console.log(providers);
-            res.redirect('/');
-        }
     });
 });
+        
+
+router.get('/alerts',(req, res) => {
+    req.session.VIEWDATA = {}
+    res.redirect('/');
+    });
+
 
 // Make a Graph call using the provided form data.
 router.post('/GetAlerts', ensureAuthenticated, (req, res) => {
     // console.log(req);
     let formData = req.body;
+    req.session.VIEWDATA = {}
     req.session.VIEWDATA.formData = formData;
-    req.session.VIEWDATA.alert = null;
-    delete req.session.VIEWDATA.oldAlert;
-    delete req.session.VIEWDATA.webhook; 
+    req.session.VIEWDATA.apiVersion = APIVERSION;
+    req.session.VIEWDATA.restUrl = RESTURL; 
 
     let filterQuery = buildFilterQuery(formData);
     console.log("filterQuery : ", filterQuery);
@@ -143,7 +162,7 @@ router.post('/GetAlerts', ensureAuthenticated, (req, res) => {
         } else {
             req.session.VIEWDATA.alerts = response;
             req.session.VIEWDATA.restQuery = restQuery;
-            req.session.VIEWDATA.sdkQuery = "client.api('security/alerts').filter(" + filterQuery + ").top(" + formData.top + ").get((err, response) => {...}"; 
+            req.session.VIEWDATA.sdkQuery = "client.api('security/alerts').filter(" + filterQuery + ").top(" + formData.top + ").get((err, response) => {...});"; 
             res.redirect('/');
         }
     });
@@ -187,16 +206,14 @@ router.get('/GetAlert/:alertID', ensureAuthenticated, async (req, res) => {
     var alertID = req.params.alertID;
 
     //clear old alert data
-    delete req.session.VIEWDATA.alertUserState;
-    delete req.session.VIEWDATA.alertUserPhoto;
-    delete req.session.VIEWDATA.alertUserManager;
-    delete req.session.VIEWDATA.alertUserRegisteredDevices;
-    delete req.session.VIEWDATA.alertUserOwnedDevices;
-    delete req.session.VIEWDATA.oldAlert;
-    delete req.session.VIEWDATA.webhook; 
+    req.session.VIEWDATA = {}
+
+    req.session.VIEWDATA.apiVersion = APIVERSION;
+    req.session.VIEWDATA.restUrl = RESTURL; 
+
 
     // set the query details in the view data
-    req.session.VIEWDATA.sdkQuery = "client.api('security/alerts/ "+ alertID + "').get((err, response) => {...}";
+    req.session.VIEWDATA.sdkQuery = "client.api('security/alerts/ "+ alertID + "').get((err, response) => {...});";
     req.session.VIEWDATA.restQuery = "security/alerts/" + alertID;
 
     var response = await getAlert(req, res, alertID); // make a call to the api
@@ -236,7 +253,6 @@ function getAlert(req, res, id) {
         });
 }
 
-
 // call the graph to get the user info
 function getUserInfo(req, upn) {
     return client.api('users/' + upn) 
@@ -253,6 +269,7 @@ function getUserInfo(req, upn) {
 // call the graph to get the users photo
 function getUserPhoto(req, upn) {
     return client.api("users/" + upn + "/photo/$value")
+        .header("Content-type", "image/Png")
         .version('beta')    
         .get()
         .then((response) => {
@@ -263,6 +280,7 @@ function getUserPhoto(req, upn) {
             console.log("Photo error : ",err);
         });
 }
+
 
 // call the graph to get the users manager
 function getUserManager(req, upn) {
@@ -328,18 +346,42 @@ function getSubscriptions() {
     });
 }
 
+// call the graph to get the tenants secure score
+function getSecureScores(req) {
+    return client.api('/security/secureScores')
+        .top(1)
+        .get()
+        .then((response) => {
+            // console.log("Secure Scores: ", response);
+            req.session.secureScores = response;
+        })
+        .catch((err) => {
+            console.log("secureScores error : ",err);
+        });
+}
+
+// call the graph to get the tenants secure score
+function getSecureScoreProfiles(req) {
+    return client.api('/security/secureScoreControlProfiles') 
+        .get()
+        .then((response) => {
+            // console.log("Secure Score profiles: ", response);
+            req.session.VIEWDATA.secureScoreProfiles = response;
+        })
+        .catch((err) => {
+            console.log("secureScoreProfiles error : ",err);
+        });
+}
+
 // make a PATCH request to the API with the update form data.
 router.post('/UpdateAlert', ensureAuthenticated, async (req, res) => {
     let updateForm = req.body;
-    req.session.VIEWDATA.alert = null;   // clear old alert
+
+    req.session.VIEWDATA = {}
+    req.session.VIEWDATA.apiVersion = APIVERSION;
+    req.session.VIEWDATA.restUrl = RESTURL; 
+
     var alertID = updateForm.alertId;
-    delete updateForm.alertId;
-    delete req.session.VIEWDATA.alertUserState;
-    delete req.session.VIEWDATA.alertUserPhoto;
-    delete req.session.VIEWDATA.alertUserManager;
-    delete req.session.VIEWDATA.alertUserRegisteredDevices;
-    delete req.session.VIEWDATA.alertUserOwnedDevices;
-    delete req.session.VIEWDATA.webhook; 
 
     if (alertID === '') {
         console.log("No Alert ID entered");
@@ -350,9 +392,6 @@ router.post('/UpdateAlert', ensureAuthenticated, async (req, res) => {
         // make a call to save the alert before the PATCH request
         req.session.VIEWDATA.oldAlert = await getAlert(req, res, alertID);
 
-        delete req.session.VIEWDATA.sdkQuery;
-        delete req.session.VIEWDATA.restQuery; // using postRestQuery instead because of the body
-
         if (req.session.VIEWDATA.oldAlert) { // if the alert exists
             updateForm.assignedTo = await getUserEmail(); // get the current user email
             
@@ -360,7 +399,7 @@ router.post('/UpdateAlert', ensureAuthenticated, async (req, res) => {
             let vendorInfo = req.session.VIEWDATA.oldAlert.vendorInformation;
             updateForm.vendorInformation = vendorInfo;
 
-            //parce comments and create array
+            //parse comments and create array
             var comments = updateForm.comments;
             if (comments != ''){
                 console.log("splitting");
@@ -375,13 +414,11 @@ router.post('/UpdateAlert', ensureAuthenticated, async (req, res) => {
                 body: updateForm
             };
             console.log("PATCH Body : ", updateForm);
-            client.api('security/alerts/' + alertID).patch(updateForm, async (err, response) => {
-                if (err) {
-                    console.log(err);
-                    renderError(err, res);
-                } else {
-                    // make another call to get the updated alert
-                    var alert = await getAlert(req, res, alertID);
+
+            try {
+                let response = await client.api('security/alerts/' + alertID).patch(updateForm);
+                console.log("Response: ", response);
+                var alert = await getAlert(req, res, alertID);
                     req.session.VIEWDATA.alert = alert;
 
                     if (alert.userStates && alert.userStates[0] && alert.userStates[0].userPrincipalName) {
@@ -389,10 +426,11 @@ router.post('/UpdateAlert', ensureAuthenticated, async (req, res) => {
                         await Promise.all([getUserPhoto(req, upn), getUserInfo(req, upn), getUserManager(req, upn)
                             , getUserRegisteredDevices(req, upn), getUserOwnedDevices(req, upn)]);
                     }
-                    delete req.session.VIEWDATA.alerts; // clear the previous alerts in the matching alerts table
                     res.redirect('/');
-                }
-            });
+            } catch (error) {
+                console.log(error);
+                renderError(error, res);            
+            }
         } else {
             res.redirect('/');
         }
@@ -402,11 +440,12 @@ router.post('/UpdateAlert', ensureAuthenticated, async (req, res) => {
 // Make a Graph call using the provided form data to update or create a webhook subscription.
 router.post('/subscribe', ensureAuthenticated, async (req, res) => {
     let formData = req.body;
+
+    req.session.VIEWDATA = {}
+
     req.session.VIEWDATA.webhookFormData = formData;
-    req.session.VIEWDATA.alert = null;
-    delete req.session.VIEWDATA.oldAlert; 
-    delete req.session.VIEWDATA.webhook; 
-    delete req.session.VIEWDATA.restQuery;
+    req.session.VIEWDATA.apiVersion = APIVERSION;
+    req.session.VIEWDATA.restUrl = RESTURL; 
 
     let filterQuery = buildFilterQuery(formData);
 
@@ -433,13 +472,13 @@ router.post('/subscribe', ensureAuthenticated, async (req, res) => {
                 }
             }
         }
-        if (oldsub != null) { // update the same webhook subscription
+        if (oldsub != null) { // update(PATCH) the same webhook subscription
             body = {};
             body['expirationDateTime'] = expire;
             console.log("body : ", body);
             console.log("Old sub : ", oldsub);
             client.api('subscriptions/'+ oldsub.id).patch(body, (err, response) => {
-                req.session.VIEWDATA.sdkQuery = "client.api('subscriptions').patch(body, (err, response) => {...}"; 
+                req.session.VIEWDATA.sdkQuery = "client.api('subscriptions').patch(body, (err, response) => {...});"; 
                 req.session.VIEWDATA.postRestQuery = {
                     query: "subscriptions/"+ oldsub.id,
                     body: body
@@ -459,7 +498,7 @@ router.post('/subscribe', ensureAuthenticated, async (req, res) => {
         } else {    // Create a new webhook subscription
             console.log("body : ", body);
             client.api('subscriptions').post(body, (err, response) => {
-                req.session.VIEWDATA.sdkQuery = "client.api('subscriptions').post(body, (err, response) => {...}"; 
+                req.session.VIEWDATA.sdkQuery = "client.api('subscriptions').post(body, (err, response) => {...});"; 
                 req.session.VIEWDATA.postRestQuery = {
                     query: "subscriptions",
                     body: body
@@ -485,17 +524,101 @@ router.post('/subscribe', ensureAuthenticated, async (req, res) => {
 
 // get webhook subscriptions
 router.get('/subscriptions', ensureAuthenticated, async (req, res) => {
-    req.session.VIEWDATA.alert = null;
-    delete req.session.VIEWDATA.oldAlert; 
+
+    req.session.VIEWDATA = {}
+
+    req.session.VIEWDATA.apiVersion = APIVERSION;
+    req.session.VIEWDATA.restUrl = RESTURL; 
 
     let response = await getSubscriptions();
     
     console.log('subscription GET response : ', response);
     req.session.VIEWDATA.webhook = {'GET': response};
     req.session.VIEWDATA.restQuery = 'subscriptions';
-    req.session.VIEWDATA.sdkQuery = "client.api('subscriptions').get((err, response) => {...}"; 
+    req.session.VIEWDATA.sdkQuery = "client.api('subscriptions').get((err, response) => {...});"; 
     res.redirect('/');
 });
+
+
+// get all the providers for the current tenant
+router.get('/secureScore', ensureAuthenticated, async (req, res) => {
+    req.session.VIEWDATA = {};
+    var restQuery = "security/secureScoreControlProfiles";
+    req.session.VIEWDATA.restQuery = restQuery;
+    req.session.VIEWDATA.apiVersion = APIVERSION;
+    req.session.VIEWDATA.restUrl = RESTURL; 
+
+    await getSecureScoreProfiles(req)
+    req.session.VIEWDATA.sdkQuery = "client.api('/security/secureScoreControlProfiles').get((err, response) => {...});"; 
+    res.redirect('/');
+});
+
+router.get('/Actions', ensureAuthenticated, (req, res) => {
+    req.session.VIEWDATA = {}
+    req.session.VIEWDATA.apiVersion = "beta";
+    req.session.VIEWDATA.restUrl = "https://graph.microsoft.com/beta/"; 
+    req.session.VIEWDATA.restQuery = 'security/securityActions';
+    req.session.VIEWDATA.sdkQuery = "client.api('security/securityActions').version('beta').get().then((response) => {...}).catch((err) => {...}));";
+
+
+    client.api('/security/securityActions')
+        .version("beta")
+        .get()
+        .then((response) => {
+            console.log("Security actions: ", response);
+            req.session.VIEWDATA.securityActions = {'GET': response.value};
+            res.redirect('/');
+        })
+        .catch((err) => {
+            console.log("securityActions error : ",err);
+            renderError(error, res); 
+        });
+
+});
+
+// make a PATCH request to the API with the update form data.
+router.post('/Actions', ensureAuthenticated, (req, res) => {
+    let actionForm = req.body;
+
+    req.session.VIEWDATA = {}
+    req.session.VIEWDATA.apiVersion = "beta";
+    req.session.VIEWDATA.restUrl = "https://graph.microsoft.com/beta/"; 
+
+    console.log(actionForm);
+
+    var ActionBody = {};
+
+    ActionBody['name'] = actionForm.SelectAction;
+    ActionBody['vendorInformation'] = req.session.vendorInfo[actionForm.provider];
+    ActionBody['parameters'] = [ {"name": actionForm.propertyName, "value": actionForm.propertyValue} ];
+    ActionBody['actionReason'] = actionForm.reason;
+
+    req.session.VIEWDATA.sdkQuery = "client.api('security/securityActions').version('beta').post(ActionBody).then((response) => {...}).catch((err) => {...}));";
+            
+    req.session.VIEWDATA.postRestQuery = {
+        query: "security/securityActions",
+        body: ActionBody,
+        method: "POST"
+    };
+    console.log("POST Body : ", ActionBody);
+
+
+    client
+        .api('security/securityActions')
+        .version('beta')
+        .post(ActionBody)
+        .then((response) => {
+            console.log("Security actions: ", response);
+            req.session.VIEWDATA.securityActions = {'POST': [response]};
+            res.redirect('/');
+        })
+        .catch((err) => {
+            console.log("securityActions error : ",err);
+            renderError(error, res); 
+        });
+    // res.redirect('/');
+});
+
 
 
 // clear the session when logging out
@@ -504,11 +627,9 @@ router.get('/logout', (req, res) => {
         req.logOut();
         res.clearCookie('graphNodeCookie');
         res.status(200);
-        // req.session.VIEWDATA = {};
         res.redirect('/');
     });
 });
-
 
 
 // helper function to ensure that the user is authenticated by Azure AD
@@ -518,25 +639,13 @@ function ensureAuthenticated(req, res, next) {
   res.redirect('/login');
 }
 
-function hasAccessTokenExpired(e) {
-    let expired;
-    if (!e.innerError) {
-      expired = false;
-    } else {
-      expired = e.forbidden &&
-        e.message === 'InvalidAuthenticationToken' &&
-        e.response.error.message === 'Access token has expired.';
-    }
-    return expired;
-  }
-
 // renders the error page
   function renderError(e, res) {
       e.innerError = (e.response) ? e.response.text : '';
       console.log(e);
       if (e.message.includes("Must respond with 200 OK to this request.")){
         console.log("**** Run 'ngrok' to allow the webhook service to call your localhost app.****\n**** Update the config.js file to the corresponding URL.****");
-        let message = "<strong>Error:</strong> Please run 'ngrok' to allow the webhook notification sevice to access your app, then update the config.js file to the correct ngrok url.";
+        let message = "<strong>Error:</strong> Please run 'ngrok' to allow the webhook notification service to access your app, then update the config.js file to the correct ngrok url.";
         res.flash('danger', message);
       }
 
