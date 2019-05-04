@@ -20,9 +20,9 @@ This sample shows how to connect a Node.js app to a Microsoft work or school (Az
 
 To use the Microsoft Graph Connect Sample for Node.js, you need the following:
 
- * [Node.js](https://nodejs.org/) version >=7.6.0.
+* [Node.js](https://nodejs.org/) version >=7.6.0.
 
- * Either a [Microsoft account](https://www.outlook.com/) or a [work or school account](http://dev.office.com/devprogram)
+* Either a [Microsoft account](https://www.outlook.com/) or a [work or school account](http://dev.office.com/devprogram)
 
 * [Ngrok](https://ngrok.com/download) for webhook notifications.
 
@@ -32,7 +32,7 @@ To configure the samples, you'll need to register a new application in the Micro
 
 Follow these steps to register a new application:
 
-1. Sign in to the [Application Registration Portal](https://go.microsoft.com/fwlink/?linkid=2083908) using either your personal or work or school account.
+1. Sign in to the [Azure app registration portal](https://go.microsoft.com/fwlink/?linkid=2083908) using either your personal or work or school account.
 
 2. Choose **New registration**. Enter *http://localhost:3000/token* as the Redirect URI.
 
