@@ -1,3 +1,21 @@
+---
+page_type: sample
+products:
+- ms-graph
+languages:
+- nodejs
+- javascript
+- html
+extensions:
+  contentType: samples
+  technologies:
+  - Microsoft Graph
+  - Microsoft identity platform
+  services:
+  - Microsoft identity platform
+  - Security
+  createdDate: 6/7/2018 1:14:00 PM
+---
 ﻿# Microsoft Graph Security API Connect Sample for Node.js
 
 ## Table of contents
