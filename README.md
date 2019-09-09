@@ -12,7 +12,7 @@ extensions:
   - Microsoft Graph
   - Microsoft identity platform
   services:
-  - Microsoft identity platform
+  - Microsoft identity platform 
   - Security
   createdDate: 6/7/2018 1:14:00 PM
 ---
